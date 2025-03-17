@@ -14,25 +14,25 @@ const publicDirPath = path.join(__dirname, "../public")
 
 app.use(express.static(publicDirPath))
  
-// // let count = 0
-// // let userID = 0
-// io.on("connection", (socket) => {  
-//     console.log("New web socket connection")
-//     userID++
-//     socket.emit("countUpdated", count, userID);
+let count = 0
+let userID = 0
+io.on("connection", (socket) => {  
+    console.log("New web socket connection")
+    userID++
+    socket.emit("countUpdated", count, userID);
     
 
-//     socket.on('increment', () => {
-//         count++
-//         io.emit('countUpdated', count, userID)
-//     })
+    // socket.on('increment', () => {
+    //     count++
+    //     io.emit('countUpdated', count, userID)
+    // })
 
-//     socket.on('sendText', (userText) => {
-//         io.emit("showMessage", userText, userID)
-//         console.log(userText)
-//     })
+    socket.on('sendText', (userText) => {
+        io.emit("showMessage", userText, userID)
+        console.log(userText)
+    })
 
-// })
+})
 
 io.on("connection", (socket) => {
     console.log("New web socket connection")
