@@ -56,4 +56,6 @@ socket.on("showMessage", (userText, userID) => {
         newMessageDiv.style.backgroundColor = "red"
     }
 
+    document.getElementById('mes').value = ""
+
 })
