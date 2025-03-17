@@ -39,6 +39,7 @@ button.addEventListener('click', () => {
     const userText = textarea.value
     console.log('Message was read')
     socket.emit("sendText", userText)
+    document.getElementById('mes').value = ""
 })
 
 
@@ -55,7 +56,5 @@ socket.on("showMessage", (userText, userID) => {
     else {
         newMessageDiv.style.backgroundColor = "red"
     }
-
-    document.getElementById('mes').value = ""
 
 })

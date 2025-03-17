@@ -29,9 +29,8 @@ io.on("connection", (socket) => {
 
     socket.on('sendText', (userText) => {
         io.emit("showMessage", userText, userID)
-        console.log(userText)
+        // console.log(userText)
     })
-
 })
 
 io.on("connection", (socket) => {
