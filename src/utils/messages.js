@@ -5,8 +5,9 @@ const generateMessage = (text) => {
     }
 }
 
-const generateLocationMessages = (loc) => {
+const generateLocationMessages = (username, loc) => {
     return {
+        username, 
         url: loc,
         createdAt: new Date().getTime() 
     }

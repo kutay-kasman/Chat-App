@@ -32,12 +32,13 @@ socket.on("message", (message) => {
 }) 
 
 // send location with link
-socket.on('locationMessage', (locationURL) => {
-    console.log(locationURL)
+socket.on('locationMessage', (message) => {
+    console.log(message)
 
     const html = Mustache.render(locationTemplate, {
-        url: locationURL,
-        createdAt: moment(locationURL.createdAt).format('HH:mm')
+        username: message.username, 
+        url: message.url,
+        createdAt: moment(message.createdAt).format('HH:mm')
     })
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = html
