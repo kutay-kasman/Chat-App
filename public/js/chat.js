@@ -10,12 +10,34 @@ const mesContainer = document.getElementById('message-container')
 //templates
 const mesTemplate = document.getElementById('message-template').innerHTML
 const locationTemplate = document.getElementById('location-template').innerHTML
+const sidebarTemplate = document.getElementById('sidebar-template').innerHTML
 
+
+// options
+const {username, room} = Qs.parse(location.search, {ignoreQueryPrefix: true}) 
+
+
+// send message and create an div element
+socket.on("message", (message) => {
+    console.log(message)
+
+    const html = Mustache.render(mesTemplate , {
+        text: message.text,
+        createdAt: moment(message.createdAt).format('HH:mm')
+    })
+    
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = html
+    mesContainer.insertAdjacentElement('beforeend', tempDiv.firstElementChild)
+}) 
+
+// send location with link
 socket.on('locationMessage', (locationURL) => {
     console.log(locationURL)
 
     const html = Mustache.render(locationTemplate, {
-        locationURL
+        url: locationURL,
+        createdAt: moment(locationURL.createdAt).format('HH:mm')
     })
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = html
@@ -23,18 +45,21 @@ socket.on('locationMessage', (locationURL) => {
     mesContainer.insertAdjacentElement('beforeend', tempDiv.firstElementChild)
 })
 
-
-socket.on("message", (message) => {
-    console.log(message)
-
-    const html = Mustache.render(mesTemplate , {
-        mes: message
+// send userList to the chat sidebar
+socket.on('roomData', ({room, users}) => {
+    const html = Mustache.render(sidebarTemplate, {
+        room,
+        users
     })
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = html
-    mesContainer.insertAdjacentElement('beforeend', tempDiv.firstElementChild)
-}) 
 
+    sidebar.innerHTML = html
+
+})
+
+
+// EVENT LISTENERS
+
+// send message event listener
 messageForm.addEventListener('submit', (e) => {
     e.preventDefault()
     submitButton.setAttribute('disabled', 'disabled')    // disable sendLocation button while its sending
@@ -55,6 +80,7 @@ messageForm.addEventListener('submit', (e) => {
     })
 })
 
+// send location event listener
 sendLocationButton.addEventListener('click', () => {
     if(!navigator.geolocation) {
         return alert('Geolocation is not supported with your browser')
@@ -77,75 +103,9 @@ sendLocationButton.addEventListener('click', () => {
 })
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//receive the event sending
-// on is for event listener
-// socket.on("countUpdated", (count, userId) => {   // name should be matched exatcly with server sending socket.emit
-//     userId++
-    // console.log("The count is ", count, userId)
-
-    // const numberShow = document.getElementById('number')
-    // numberShow.innerHTML = count
-// })    
-
-// const incrementButton = document.querySelector("#increment")
-// incrementButton.addEventListener('click', () => {
-//     console.log("Clicked")
-//     socket.emit('increment')
-// })
-
-
-
-
-// const button = document.getElementById('setText')
-// const textarea = document.getElementById('mes')
-// button.addEventListener('click', () => {
-//     const userText = textarea.value
-//     console.log('Message was read')
-//     socket.emit("sendText", userText)
-//     document.getElementById('mes').value = ""
-// })
-
-
-// socket.on("showMessage", (userText, userID) => {
-//     const message = document.getElementById('message')
-//     const newMessageDiv = document.createElement("div")
-    
-//     newMessageDiv.innerText = userText
-//     message.appendChild(newMessageDiv)
-
-//     if(userID % 2) {
-//         newMessageDiv.style.backgroundColor = "cyan"
-//     }
-//     else {
-//         newMessageDiv.style.backgroundColor = "red"
-//     }
-
-// })
+socket.emit('join', {username, room}, (error) => {
+    if(error) {
+        alert(error)
+        location.href = '/'
+    }
+})
