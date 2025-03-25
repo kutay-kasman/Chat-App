@@ -9,6 +9,7 @@ const mesContainer = document.getElementById('message-container')
 
 //templates
 const mesTemplate = document.getElementById('message-template').innerHTML
+const sysMesTemplate = document.getElementById('sys-message-template').innerHTML
 const locationTemplate = document.getElementById('location-template').innerHTML
 const sidebarTemplate = document.getElementById('sidebar-template').innerHTML
 
@@ -16,18 +17,66 @@ const sidebarTemplate = document.getElementById('sidebar-template').innerHTML
 // options
 const {username, room} = Qs.parse(location.search, {ignoreQueryPrefix: true}) 
 
+const autoscroll = () => {
+    // new message element
+    const newMessage = mesContainer.lastElementChild
+    
+    // height of new message
+    const newMessageStyles = getComputedStyle(newMessage)
+    const newMessageMargin = parseInt(newMessageStyles.marginBottom)
+    const newMessageHeight = newMessage.offsetHeight + newMessageMargin
+
+    // visible height
+    const visibleHeight = mesContainer.offsetHeight
+
+    // height of messages container
+    const containerHeight = mesContainer.scrollHeight
+
+    // how far have I scrolled
+    const scrollOffset = mesContainer.scrollTop + visibleHeight
+
+    if(containerHeight - newMessageHeight <= scrollOffset) {
+        mesContainer.scrollTop = mesContainer.scrollHeight
+    }
+}
 
 // send message and create an div element
 socket.on("message", (message) => {
     console.log(message)
 
     const html = Mustache.render(mesTemplate , {
+        username: message.username, 
         text: message.text,
-        createdAt: moment(message.createdAt).format('HH:mm')
+        createdAt: moment(message.createdAt).format('HH:mm'),
     })
     
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = html
+
+    mesContainer.insertAdjacentElement('beforeend', tempDiv.firstElementChild)
+    autoscroll()
+}) 
+
+// send message and create an div element
+socket.on("sys-message", (message) => {
+    console.log(message)
+
+    const html = Mustache.render(sysMesTemplate , {
+        text: message.text,
+        createdAt: moment(message.createdAt).format('HH:mm'),
+        type: message.type || ""
+    })
+    
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = html
+
+    if (message.type === "join") {
+        tempDiv.firstElementChild.classList.add("join-message");
+    }
+    if(message.type === "exit") {
+        tempDiv.firstElementChild.classList.add('exit-message')
+    }
+    
     mesContainer.insertAdjacentElement('beforeend', tempDiv.firstElementChild)
 }) 
 

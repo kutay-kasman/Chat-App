@@ -1,7 +1,16 @@
-const generateMessage = (text) => {
+const generateMessage = (username, text,) => {
+    return {
+        username,
+        text,
+        createdAt: new Date().getTime(),
+    }
+}
+
+const generateSystemMessage = (text, type = "") => {
     return {
         text,
-        createdAt: new Date().getTime()
+        createdAt: new Date().getTime(),
+        type
     }
 }
 
@@ -15,5 +24,5 @@ const generateLocationMessages = (username, loc) => {
 
 
 module.exports = {
-    generateMessage, generateLocationMessages
+    generateMessage, generateSystemMessage, generateLocationMessages 
 }

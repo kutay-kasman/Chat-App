@@ -31,16 +31,28 @@
 
     <script id="message-template" type="text/html">
         <div id="mes-box">
-            <div>{{text}}</div>
-            <div> {{createdAt}}</div>
+            <div class="mes-box-timeless">
+                <div class="username">{{username}}</div>
+                <div class="content">{{text}}</div>
+            </div>
+            <div class="time">{{createdAt}}</div>
+        </div>
+    </script>
+    
+    <script id="sys-message-template" type="text/html">
+        <div id="sys-mes-box" class="{{type}}">
+            <div class="sys-content">{{text}}</div>
+            <div class="time">{{createdAt}}</div>
         </div>
     </script>
 
     <script id="location-template" type="text/html">
-        <div id="loc-box">
-            <div><a href={{url}} target="_blank">This is my Location</a></div>
-            <div>{{createdAt}}</div>
-            <div>{{username}}</div>    
+        <div id="loc-box" class="{{type}}">
+            <div #loc-box-timeless>
+                <div class="username">{{username}}</div>    
+                <div class="content"><a href={{url}} target="_blank">This is my Location</a></div>
+            </div>
+            <div class="time">{{createdAt}}</div>
         </div>
     </script>
 

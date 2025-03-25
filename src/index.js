@@ -3,7 +3,7 @@ const http = require("http")
 const express = require("express")
 const socketio = require("socket.io")
 const Filter = require("bad-words")
-const {generateMessage, generateLocationMessages} = require("./utils/messages.js")
+const {generateMessage, generateSystemMessage, generateLocationMessages} = require("./utils/messages.js")
 const {addUser, removeUser, getUser, getUsersInRoom} = require("../src/utils/users.js")
 
 
@@ -31,8 +31,8 @@ io.on("connection", (socket) => {
         }
 
         socket.join(user.room)        
-        socket.emit("message", generateMessage('Welcome!')) 
-        socket.broadcast.to(room).emit("message", generateMessage(`${user.username} has joined`))
+        socket.emit("sys-message", generateSystemMessage('Welcome!')) 
+        socket.broadcast.to(room).emit("sys-message", generateSystemMessage(`${user.username} has joined`, "join"))
         io.to(user.room).emit('roomData', {
             room: user.room,
             users: getUsersInRoom(user.room)
@@ -44,12 +44,12 @@ io.on("connection", (socket) => {
 
     // send message
     socket.on('sendMessage', (message ,callback) => {
-        
+        const user = getUser(socket.id)
         const filter = new Filter()
         if(filter.isProfane(message)) {
             return callback('The profanity is not allowed')
         }
-        io.to(getUser(socket.id).room).emit("message", generateMessage(message))
+        io.to(getUser(socket.id).room).emit("message", generateMessage(user.username, message))
         callback()
     
     })
@@ -70,7 +70,7 @@ io.on("connection", (socket) => {
         const user = removeUser(socket.id)
         
         if(user) {
-            socket.broadcast.to(user.room).emit("message", generateMessage(`${user.username} has left`))
+            socket.broadcast.to(user.room).emit("sys-message", generateSystemMessage(`${user.username} has left`, "exit"))
             io.to(user.room).emit('roomData', {
                 room: user.room,
                 users: getUsersInRoom(user.room)

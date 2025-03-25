@@ -94,6 +94,27 @@ body {
     margin: 10px 0;
 }
 
+#mes-box, #loc-box, #sys-mes-box {
+    display: flex;
+    justify-content:space-between;
+}
+
+.join-message {
+    color: green;
+}
+.exit-message {
+    color: red;
+}
+
+.username {
+    font-weight: bold;
+}
+
+.content {
+    position: relative;
+    left: 10px ;
+}
+
 /* Form */
 form {
     display: flex;
