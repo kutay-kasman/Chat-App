@@ -103,6 +103,13 @@ sendLocationButton.addEventListener('click', () => {
     })
 })
 
+const exitRoom = document.getElementById('exit-room')
+
+exitRoom.addEventListener('click', () => {
+    window.location.replace('./index.html')
+})
+
+
 
 socket.emit('join', {username, room}, (error) => {
     if(error) {
