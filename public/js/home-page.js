@@ -5,7 +5,7 @@ async function fetchRooms() {
         const roomsList = document.getElementById("rooms-list-ul");
         
         // Create the header
-        const header = `<li><strong>Room Name</strong> | <strong>User Number</strong></li>`;
+        const header = `<li><strong>Room Name</strong> | <strong>Number of Users</strong></li>`;
         
         // Check if rooms exist and map over them
         roomsList.innerHTML = rooms.length 
