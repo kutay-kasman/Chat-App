@@ -1,7 +1,7 @@
 /* General Reset */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-image: linear-gradient(to right top, #c199b0, #bf9aba, #b99bc5, #af9ed0, #a1a2db, #979de1, #8b99e6, #7c95ec, #7d85ec, #8572e9, #925ce2, #a13ed6);
     margin: 0;
     display: flex;
     justify-content: center;
@@ -32,6 +32,7 @@ body {
     text-align: center;
     margin: 10px;
 }
+
 
 /* Headings */
 h1, h2 {
@@ -106,6 +107,12 @@ h2 {
     transform: scale(1.05);
 }
 
+#home-page-room-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .centered-form {
@@ -132,3 +139,4 @@ h2 {
         font-size: 14px;
     }
 }
+
