@@ -85,7 +85,6 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", ()=> {
         const user = removeUser(socket.id)
-        console.log(user)
         if(user) {
             decreaseUserNum(user.room)
             socket.broadcast.to(user.room).emit("sys-message", generateSystemMessage(`${user.username} has left`, "exit"))
