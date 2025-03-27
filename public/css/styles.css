@@ -129,7 +129,7 @@ form {
 
 #message {
     flex: 1;
-    padding: 10px;
+    padding: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -207,7 +207,6 @@ form {
 
     form {
         flex-direction: column;
-        align-items: center;
     }
 
     #message {
