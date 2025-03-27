@@ -106,6 +106,15 @@ socket.on('roomData', ({room, users}) => {
 
 })
 
+// Listen for the 'updateRoomList' event to update the room list on the home page
+socket.on('updateRoomList', (rooms) => {
+    const roomsList = document.getElementById("rooms-list-ul");
+
+    roomsList.innerHTML = rooms.length
+        ? rooms.map(room => `<li> ${room.roomName} - ${room.userNum}</li>`).join('')
+        : "<li>No active rooms</li>";
+});
+
 
 // EVENT LISTENERS
 

@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Chat App</title>
-        <link rel="stylesheet" href="./css/home-page.css">
-        <link rel="icon" href="./img/chat-bubble.png">
-    </head>
-    <body>
-        <div class="centered-form">
-            <div class="centered-form__box">
-                <h1>Join </h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="./css/home-page.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>        
+    <div class="centered-form">
+        <div class="centered-form__box">
+           <div id="join-side">
+                <h1>Join</h1>
                 <form action="./chat.html">
                     <label for="username">Name</label>
                     <input type="text" id="username" name="username" placeholder="Enter Name" required>
@@ -20,7 +24,20 @@
 
                     <button>Join</button>
                 </form>
+           </div>
+        </div>
+        <div class="centered-form__box">
+            <div id="room-side">
+                <h2>Active Rooms</h2>
+                <ul id="rooms-list-ul"></ul>
             </div>
         </div>
-    </body>
+    </div>    
+
+    <script id="rooms-template" type="text/html">
+        <ul id="rooms-list"></ul>
+    </script>
+
+    <script src="/js/home-page.js"></script>
+</body>
 </html>

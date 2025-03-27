@@ -13,6 +13,7 @@ body {
 /* Chat Container */
 .chat-container {
     display: flex;
+    flex-direction: row;
     width: 90%;
     max-width: 900px;
     height: 80vh;
@@ -65,6 +66,7 @@ body {
     cursor: pointer;
     border: none;
     font-weight: bold;
+    z-index: 10;
 }
 
 #exit-room:hover {
@@ -96,7 +98,7 @@ body {
 
 #mes-box, #loc-box, #sys-mes-box {
     display: flex;
-    justify-content:space-between;
+    justify-content: space-between;
 }
 
 .join-message {
@@ -112,7 +114,7 @@ body {
 
 .content {
     position: relative;
-    left: 10px ;
+    left: 10px;
 }
 
 /* Form */
@@ -163,6 +165,13 @@ form {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+    .chat-container {
+        width: 95%;
+        height: 85vh;
+    }
+}
+
 @media (max-width: 768px) {
     .chat-container {
         flex-direction: column;
@@ -194,5 +203,34 @@ form {
         width: auto;
         margin: 10px auto;
         text-align: center;
+    }
+
+    form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #message {
+        width: 100%;
+    }
+
+    #submit-button, #send-location {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .sidebar {
+        padding: 10px;
+    }
+
+    .chat-section {
+        padding: 10px;
     }
 }

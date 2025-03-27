@@ -5,6 +5,7 @@ const socketio = require("socket.io")
 const Filter = require("bad-words")
 const {generateMessage, generateSystemMessage, generateLocationMessages} = require("./utils/messages.js")
 const {addUser, removeUser, getUser, getUsersInRoom} = require("../src/utils/users.js")
+const {addRoom, removeRoom, getRoom, getAllRooms, incUserNum, decreaseUserNum} = require("../src/utils/rooms.js")
 
 
 // set up a server with socket.io
@@ -15,14 +16,22 @@ const io = socketio(server) // now web server supports web sockets
 const port = process.env.PORT || 3000
 const publicDirPath = path.join(__dirname, "../public")
 app.use(express.static(publicDirPath))
- 
 
+app.get("/rooms", (req, res) => {
+    var rooms = getAllRooms() 
+    rooms = rooms.map((room) => {
+        if(!room.userNum) {
+            removeRoom(room.roomName)
+        }
+        return room
+    })
+    res.json(rooms);
+});
 
 // connect to socket.io
 io.on("connection", (socket) => {
     console.log("New web socket connection")
 
-    
     socket.on('join', ({username, room}, callback) => {
         const {error, user} = addUser({id: socket.id, username, room})
         
@@ -30,7 +39,15 @@ io.on("connection", (socket) => {
             return callback(error)
         }
 
-        socket.join(user.room)        
+        socket.join(user.room)   
+        // console.log(user)
+        // console.log(user.room)
+
+        // the room added
+        addRoom(user.room)
+        incUserNum(user.room)
+
+
         socket.emit("sys-message", generateSystemMessage('Welcome!')) 
         socket.broadcast.to(room).emit("sys-message", generateSystemMessage(`${user.username} has joined`, "join"))
         io.to(user.room).emit('roomData', {
@@ -68,8 +85,9 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", ()=> {
         const user = removeUser(socket.id)
-        
+        console.log(user)
         if(user) {
+            decreaseUserNum(user.room)
             socket.broadcast.to(user.room).emit("sys-message", generateSystemMessage(`${user.username} has left`, "exit"))
             io.to(user.room).emit('roomData', {
                 room: user.room,
@@ -84,3 +102,23 @@ io.on("connection", (socket) => {
 server.listen(port, () => {
     console.log("Server is up on " + port)
 })
+
+
+
+{/* <script>
+    async function fetchRooms() {
+        try {
+            const response = await fetch('/rooms');
+            const rooms = await response.json();
+            const roomsList = document.getElementById("rooms-list");
+            
+            roomsList.innerHTML = rooms.length 
+                ? rooms.map(room => `<li>${room}</li>`).join('') 
+                : "<li>No active rooms</li>";
+        } catch (error) {
+            console.error("Error fetching rooms:", error);
+        }
+    }
+
+    fetchRooms();
+</script> */}
