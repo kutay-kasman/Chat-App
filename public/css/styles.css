@@ -1,8 +1,8 @@
 /* CSS Variables */
 :root {
-    --primary-color: #667eea;
+    --primary-color: rgba(137, 150, 210, 0.7);
     --primary-hover: #5646a0;
-    --success-color: #28a745;
+    --success-color: white;
     --success-hover: #218838;
     --danger-color: #cc4b4c;
     --danger-hover: #a93233;
@@ -23,7 +23,7 @@ html {
 
 body {
     font-family: Arial, sans-serif;
-    background-image: linear-gradient(135deg, #eef2f7 0%, #c3cfe2 100%);
+    background-image: linear-gradient(to bottom, #fed5b4, #ffd3bf, #ffd2cc, #ffd3d9, #ffd5e5, #fcd6ed, #f6d7f6, #edd9fe, #dad9ff, #c4daff, #abdcff,#93ddff);
     margin: 0;
     padding: 0;
     display: flex;
