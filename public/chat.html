@@ -12,26 +12,29 @@
     <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-    <div id="exit-room" >Exit Room</div>
-    <div class="chat-container">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar">
-            
-        </aside>
+    <div class="page-wrapper">
+        <div id="exit-room">Exit Room</div>
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="sidebar">
+                
+            </aside>
 
-        <!-- Main Chat Section -->
-        <section class="chat-section">
-            <h1>Chat Application</h1>
+            <!-- Main Chat Section -->
+            <section class="chat-section">
+                <h1>Chat Application</h1>
 
-            <div id="message-container"></div>
+                <div id="message-container"></div>
 
-            <form id="messageForm">
-                <input type="text" id="message" name="message" placeholder="Message">
-                <input type="submit" id="submit-button">
-                <button id="send-location"><img src="./img/location.png" id="location-photo"></button>
-            </form> 
-        </section> 
-        
+                <form id="messageForm">
+                    <input type="text" id="message" name="message" placeholder="Message">
+                    <input type="submit" id="submit-button">
+                    <button id="send-location"><img src="./img/location.png" id="location-photo"></button>
+                </form> 
+            </section> 
+        </div>
+    </div>
+    
     <script id="message-template" type="text/html">
         <div id="mes-box">
             <div class="mes-box-timeless">
@@ -68,7 +71,6 @@
                 <li>{{username}}</li>
             {{/users}}
         </ul>
-
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>

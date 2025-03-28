@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Select Room</title>
+    <link rel="stylesheet" href="./css/rooms.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+    <div class="centered-form">
+        <div class="centered-form__box">
+            <div id="join-side">
+                <h1>Create a Room</h1>
+                <form id="room-form">
+                    <input type="hidden" id="username" name="username">
+                    
+                    <label for="room">Room Name</label>
+                    <input type="text" id="room" name="room" placeholder="Enter room name" required>
+                    
+                    <div class="room-type-selector">
+                        <label class="radio-label">
+                            <input type="radio" name="roomType" value="public" checked>
+                            Public Room
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="roomType" value="private">
+                            Private Room
+                        </label>
+                    </div>
+
+                    <div id="password-field" class="hidden">
+                        <label for="room-password">Room Password</label>
+                        <input type="password" id="room-password" name="room-password" placeholder="Enter room password">
+                    </div>
+
+                    <button type="submit">Create Room</button>
+                </form>
+            </div>
+        </div>
+        <div class="centered-form__box">
+            <div id="room-side">
+                <h2>Active Rooms</h2>
+                <ul id="rooms-list-ul"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Enter Room Password</h2>
+            <form id="password-form">
+                <input type="password" id="modal-password" placeholder="Enter password" required>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-primary">Join Room</button>
+                    <button type="button" class="btn-secondary" id="cancel-password">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Set username from URL parameter
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('username').value = params.get('username');
+    </script>
+    <script src="/js/rooms.js"></script>
+</body>
+</html> 

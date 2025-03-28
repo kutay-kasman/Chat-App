@@ -2,20 +2,28 @@ var rooms = []
 
 const roomModel = {
     roomName: '',
-    userNum: 0
+    userNum: 0,
+    isPrivate: false,
+    password: null
 }
 
 // addRoom, removeRoom, getRoom, getAllRooms
 
-const addRoom = (roomName) => {
+const addRoom = (roomName, isPrivate = false, password = null) => {
     const room = rooms.find(room => room.roomName === roomName)
 
     if (!room) {
         // Add a new room with userNum initialized to 0
-        rooms.push({ roomName, userNum: 0 })
+        rooms.push({ 
+            roomName, 
+            userNum: 0,
+            isPrivate,
+            password
+        })
+        return { roomName, isPrivate }
     }
     
-    return room
+    return { error: 'Room already exists!' }
 }
 
 const removeRoom = (roomName) => {
@@ -41,7 +49,8 @@ const getRoom = (roomName) => {
     if (room) {
         return {
             roomName: room.roomName,
-            userNum: room.userNum
+            userNum: room.userNum,
+            isPrivate: room.isPrivate
         }
     }
     return {
@@ -49,8 +58,30 @@ const getRoom = (roomName) => {
     }
 }
 
+const verifyRoomPassword = (roomName, password) => {
+    const room = rooms.find(room => room.roomName === roomName)
+    
+    if (!room) {
+        return false;
+    }
+    
+    if (!room.isPrivate) {
+        return true;
+    }
+    
+    if (!password || !room.password) {
+        return false;
+    }
+    
+    return room.password === password;
+}
+
 const getAllRooms = () => {
-    return rooms.map(room => ({roomName: room.roomName, userNum: room.userNum }));
+    return rooms.map(room => ({
+        roomName: room.roomName, 
+        userNum: room.userNum,
+        isPrivate: room.isPrivate
+    }));
 }
 
 const incUserNum = (roomName) => {
@@ -60,7 +91,8 @@ const incUserNum = (roomName) => {
         room.userNum++
         return {
             roomName: room.roomName,
-            userNum: room.userNum
+            userNum: room.userNum,
+            isPrivate: room.isPrivate
         }
     }
     return {
@@ -75,7 +107,8 @@ const decreaseUserNum = (roomName) => {
         room.userNum--
         return {
             roomName: room.roomName,
-            userNum: room.userNum
+            userNum: room.userNum,
+            isPrivate: room.isPrivate
         }
     }
     return {
@@ -104,5 +137,5 @@ const decreaseUserNum = (roomName) => {
 
 
 module.exports = {
-    addRoom, removeRoom, getRoom, getAllRooms, incUserNum, decreaseUserNum
+    addRoom, removeRoom, getRoom, getAllRooms, incUserNum, decreaseUserNum, verifyRoomPassword
 }

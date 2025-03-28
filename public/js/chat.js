@@ -15,7 +15,7 @@ const sidebarTemplate = document.getElementById('sidebar-template').innerHTML
 
 
 // options
-const {username, room} = Qs.parse(location.search, {ignoreQueryPrefix: true}) 
+const {username, room, password} = Qs.parse(location.search, {ignoreQueryPrefix: true}) 
 
 const autoscroll = () => {
     // new message element
@@ -169,7 +169,7 @@ exitRoom.addEventListener('click', () => {
 
 
 
-socket.emit('join', {username, room}, (error) => {
+socket.emit('join', {username, room, password}, (error) => {
     if(error) {
         alert(error)
         location.href = '/'
