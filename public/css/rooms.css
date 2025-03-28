@@ -21,7 +21,7 @@ html {
 
 body {
     font-family: Arial, sans-serif;
-    background-image: linear-gradient(135deg, #eef2f7 0%, #c3cfe2 100%);
+    background-image: linear-gradient(to right top, #c199b0, #bf9aba, #b99bc5, #af9ed0, #a1a2db, #979de1, #8b99e6, #7c95ec, #7d85ec, #8572e9, #925ce2, #a13ed6);
     margin: 0;
     display: flex;
     justify-content: center;

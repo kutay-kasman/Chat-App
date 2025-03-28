@@ -3,25 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <meta name="description" content="Chat application developed by Kutay Murat Kasman - A real-time messaging platform with public and private room functionality. Connect with me to discuss web development and software engineering.">
+    <meta name="author" content="Kutay Murat Kasman">
+    <meta name="keywords" content="Kutay Kasman, Kutay Murat Kasman, chat app, real-time messaging, web development, software engineer">
+    <title>Chat App by Kutay Murat Kasman</title>
     <link rel="stylesheet" href="./css/home-page.css">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 </head>
-<body>        
-    <div class="centered-form">
-        <div class="centered-form__box">
-            <div id="welcome-side">
-                <h1>Welcome to Chat App</h1>
-                <form action="./rooms.html">
-                    <label for="username">Display Name</label>
-                    <input type="text" id="username" name="username" placeholder="Enter your name" required>
-                    <button type="submit">Continue</button>
-                </form>
+<body>
+    <div class="page-container">
+        <div class="intro-section">
+            <p class="intro-text">I'm Kutay Murat Kasman, and I developed this platform to make real-time communication</p>
+        </div>
+        
+        <div class="centered-form">
+            <div class="centered-form__box">
+                <div id="welcome-side">
+                    <h1>Welcome to Chat App</h1>
+                    <form action="./rooms.html">
+                        <label for="username">Display Name</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your name" required>
+                        <button type="submit">Continue</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>    
+
+        <footer class="footer">
+            <div class="contact-links">
+                <a href="mailto:kutaykasman@gmail.com" class="footer-link">
+                    <img src="./img/email-icon.svg" alt="Email" class="social-icon">
+                    <span>kutaykasman@gmail.com</span>
+                </a>
+                <a href="https://www.linkedin.com/in/kutay-murat-kasman-a0b814168/" target="_blank" rel="noopener noreferrer" class="footer-link">
+                    <img src="./img/linkedin-icon.svg" alt="LinkedIn" class="social-icon">
+                    <span>Connect with me on LinkedIn</span>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Set username from URL parameter
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('username').value = params.get('username');
+    </script>
 </body>
 </html>
