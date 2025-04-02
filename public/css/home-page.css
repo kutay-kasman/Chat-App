@@ -175,6 +175,13 @@ button:hover {
     background-color: #6B7FD7;
     transform: translateY(-1px);
 }
+#donate-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    z-index: 1000;     /* Ensures it stays on top */
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
