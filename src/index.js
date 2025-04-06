@@ -1,3 +1,6 @@
+require('./db/mongoose.js')
+const Message = require('./models/message.js')
+const Room = require('./models/rooms.js')
 const path = require("path")
 const http = require("http")
 const express = require("express")
@@ -7,6 +10,15 @@ const {generateMessage, generateSystemMessage, generateLocationMessages} = requi
 const {addUser, removeUser, getUser, getUsersInRoom} = require("../src/utils/users.js")
 const {addRoom, removeRoom, getRoom, getAllRooms, incUserNum, decreaseUserNum, verifyRoomPassword} = require("../src/utils/rooms.js")
 
+// const testMessage = new Message({ name: "Kutay", text : "room1" })
+
+// testMessage.save()
+//   .then(() => {
+//     console.log("Message saved and database created!")
+//   })
+//   .catch((err) => {
+//     console.error("Error saving message:", err)
+//   })
 
 // set up a server with socket.io
 const app = express()
@@ -78,16 +90,17 @@ app.post("/verify-room-password", (req, res) => {
 io.on("connection", (socket) => {
     console.log("New web socket connection")
 
-    socket.on('join', async ({username, room, password}, callback) => {
+    // In src/index.js, update the 'join' event handler
+socket.on('join', async ({username, room, password}, callback) => {
+    try {
         const roomData = getRoom(room);
         
         if (roomData.error) {
             return callback('Room does not exist');
         }
         
-        // Only verify password for private rooms when joining (not creating)
+        // Verify password for private rooms
         if (roomData.isPrivate) {
-            // Skip password verification if this is the room creator (they just created the room)
             const isRoomCreator = getAllRooms().find(r => r.roomName === room && r.password === password);
             
             if (!isRoomCreator) {
@@ -98,40 +111,93 @@ io.on("connection", (socket) => {
             }
         }
         
-        const {error, user} = addUser({id: socket.id, username, room})
+        const {error, user} = addUser({id: socket.id, username, room});
         
         if(error) {
-            return callback(error)
+            return callback(error);
         }
 
-        socket.join(user.room)   
+        socket.join(user.room);
+
+        // Find or create room in database
+        let dbRoom = await Room.findOne({ roomName: room });
+        if (!dbRoom) {
+            dbRoom = new Room({
+                roomName: room,
+                userName: username
+            });
+            await dbRoom.save();
+        }
+
+        // Fetch message history
+        const messageHistory = await Message.getMessagesByRoom(dbRoom._id);
+        
+        // Send message history to the joining user
+        socket.emit('messageHistory', messageHistory.map(msg => ({
+            username: msg.name,
+            text: msg.text,
+            createdAt: msg.createdAt
+        })));
 
         // Increment user count
         if (!roomData.error) {
-            incUserNum(user.room)
+            incUserNum(user.room);
         }
 
-        socket.emit("sys-message", generateSystemMessage('Welcome!')) 
-        socket.broadcast.to(room).emit("sys-message", generateSystemMessage(`${user.username} has joined`, "join"))
+        socket.emit("sys-message", generateSystemMessage('Welcome!')); 
+        socket.broadcast.to(room).emit("sys-message", generateSystemMessage(`${user.username} has joined`, "join"));
         io.to(user.room).emit('roomData', {
             room: user.room,
             users: getUsersInRoom(user.room)
-        })
+        });
 
-        callback()
-    })
+        callback();
+    } catch (error) {
+        callback(error.message);
+    }
+});
 
-    // send message
-    socket.on('sendMessage', (message ,callback) => {
-        const user = getUser(socket.id)
-        const filter = new Filter()
-        if(filter.isProfane(message)) {
-            return callback('The profanity is not allowed')
-        }
-        io.to(getUser(socket.id).room).emit("message", generateMessage(user.username, message))
-        callback()
+    socket.on('sendMessage', async (message, callback) => {
+        const user = getUser(socket.id);
+        const filter = new Filter();
     
-    })
+        // Check if the message contains profanity
+        if (filter.isProfane(message)) {
+            return callback('The profanity is not allowed');
+        }
+    
+        try {
+            // Find the room by roomName
+            let room = await Room.findOne({roomName: user.room});
+    
+            // If the room doesn't exist, create a new room
+            if (!room) {
+                console.log(`Room ${user.room} not found. Creating a new room...`);
+                room = new Room({
+                    roomName: user.room,
+                    userName: user.username // assuming the user is the first to join
+                });
+    
+                // Save the new room to the database
+                await room.save();
+                console.log('Room created:', room);
+            }
+    
+            // Now that the room exists, create and save the message
+            const generatedMessage = await generateMessage(user.username, message, room._id);
+            
+            // Emit the message to the appropriate room
+            io.to(user.room).emit("message", generatedMessage);
+            callback();
+        } catch (err) {
+            console.error('Error sending message:', err);
+            callback('Message failed to send');
+        }
+    });
+    
+    
+    
+
 
     // send location
     socket.on('sendLocation', (location, callback) => {

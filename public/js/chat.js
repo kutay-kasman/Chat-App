@@ -1,5 +1,6 @@
 const socket = io()
 
+
 // elements
 const messageForm = document.getElementById('messageForm')
 const messageInput = document.getElementById('message')
@@ -17,33 +18,29 @@ const sidebarTemplate = document.getElementById('sidebar-template').innerHTML
 // options
 const {username, room, password} = Qs.parse(location.search, {ignoreQueryPrefix: true}) 
 
-const autoscroll = () => {
-    // new message element
-    const newMessage = mesContainer.lastElementChild
+const autoscroll = (forceScroll = false) => {
+    const newMessage = mesContainer.lastElementChild;
     
-    // height of new message
-    const newMessageStyles = getComputedStyle(newMessage)
-    const newMessageMargin = parseInt(newMessageStyles.marginBottom)
-    const newMessageHeight = newMessage.offsetHeight + newMessageMargin
+    if (!newMessage) return; // Guard clause if no messages exist
+    
+    // Calculate heights
+    const newMessageStyles = getComputedStyle(newMessage);
+    const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+    const newMessageHeight = newMessage.offsetHeight + newMessageMargin;
+    const visibleHeight = mesContainer.offsetHeight;
+    const containerHeight = mesContainer.scrollHeight;
+    const scrollOffset = mesContainer.scrollTop + visibleHeight;
 
-    // visible height
-    const visibleHeight = mesContainer.offsetHeight
-
-    // height of messages container
-    const containerHeight = mesContainer.scrollHeight
-
-    // how far have I scrolled
-    const scrollOffset = mesContainer.scrollTop + visibleHeight
-
-    if(containerHeight - newMessageHeight <= scrollOffset) {
-        mesContainer.scrollTop = mesContainer.scrollHeight
+    // Force scroll to bottom if specified or if user was already at bottom
+    if (forceScroll || containerHeight - newMessageHeight <= scrollOffset) {
+        mesContainer.scrollTop = mesContainer.scrollHeight;
     }
 }
 
 // send message and create an div element
 socket.on("message", (message) => {
-    console.log(message)
-
+    console.log(message.text)
+    
     const html = Mustache.render(mesTemplate , {
         username: message.username, 
         text: message.text,
@@ -52,7 +49,7 @@ socket.on("message", (message) => {
     
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = html
-
+    
     mesContainer.insertAdjacentElement('beforeend', tempDiv.firstElementChild)
     autoscroll()
 }) 
@@ -115,6 +112,28 @@ socket.on('updateRoomList', (rooms) => {
         : "<li>No active rooms</li>";
 });
 
+// Add this near the top of chat.js with other socket listeners
+socket.on('messageHistory', (messages) => {
+    // Clear existing messages
+    mesContainer.innerHTML = '';
+    
+    // Render each message from history
+    messages.forEach(message => {
+        const html = Mustache.render(mesTemplate, {
+            username: message.username,
+            text: message.text,
+            createdAt: moment(message.createdAt).format('HH:mm')
+        });
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        mesContainer.insertAdjacentElement('beforeend', tempDiv.firstElementChild);
+    });
+    
+    // Force scroll to bottom after loading history
+    autoscroll(true);
+});
+
 
 // EVENT LISTENERS
 
@@ -175,3 +194,47 @@ socket.emit('join', {username, room, password}, (error) => {
         location.href = '/'
     }
 })
+
+// Add this to your HTML
+const scrollButton = document.createElement('button');
+scrollButton.innerHTML = '⬇️';
+scrollButton.className = 'scroll-bottom-btn';
+scrollButton.style.display = 'none';
+mesContainer.parentElement.appendChild(scrollButton);
+
+// Add these styles to your CSS
+const styles = `
+.scroll-bottom-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: none;
+    z-index: 1000;
+}
+
+.scroll-bottom-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+`;
+
+// Add scroll monitoring to show/hide the button
+mesContainer.addEventListener('scroll', () => {
+    const bottomThreshold = 300; // pixels from bottom
+    const distanceFromBottom = 
+        mesContainer.scrollHeight - 
+        (mesContainer.scrollTop + mesContainer.clientHeight);
+    
+    scrollButton.style.display = 
+        distanceFromBottom > bottomThreshold ? 'block' : 'none';
+});
+
+// Add click handler for the scroll button
+scrollButton.addEventListener('click', () => {
+    autoscroll(true);
+});
