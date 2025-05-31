@@ -42,31 +42,47 @@ app.get("/rooms", (req, res) => {
 });
 
 // Create a new room
-app.post("/create-room", (req, res) => {
+app.post("/create-room", async (req, res) => {
     const { roomName, isPrivate, password } = req.body;
     
     if (!roomName) {
         return res.status(400).json({ message: 'Room name is required' });
     }
     
-    // For private rooms, ensure password is provided
     if (isPrivate && !password) {
         return res.status(400).json({ message: 'Password is required for private rooms' });
     }
     
-    // Trim and validate room name
     const trimmedRoomName = roomName.trim();
     if (trimmedRoomName.length === 0) {
         return res.status(400).json({ message: 'Room name cannot be empty' });
     }
     
-    const result = addRoom(trimmedRoomName, isPrivate, password);
-    
-    if (result.error) {
-        return res.status(400).json({ message: result.error });
+    try {
+        // First, check if room already exists in MongoDB
+        let dbRoom = await Room.findOne({ roomName: trimmedRoomName });
+        
+        if (!dbRoom) {
+            // Create room in MongoDB first
+            dbRoom = new Room({
+                roomName: trimmedRoomName,
+                isPrivate: isPrivate || false
+            });
+            await dbRoom.save();
+        }
+        
+        // Only after DB operation succeeds, add to in-memory storage
+        const result = addRoom(trimmedRoomName, isPrivate, password);
+        
+        if (result.error) {
+            return res.status(400).json({ message: result.error });
+        }
+        
+        res.status(201).json(result);
+    } catch (error) {
+        console.error('Error creating room:', error);
+        res.status(500).json({ message: 'Error creating room' });
     }
-    
-    res.status(201).json(result);
 });
 
 // Verify room password
@@ -93,13 +109,35 @@ io.on("connection", (socket) => {
     // In src/index.js, update the 'join' event handler
 socket.on('join', async ({username, room, password}, callback) => {
     try {
-        const roomData = getRoom(room);
+        // Add retry logic for getting room
+        let retries = 3;
+        let roomData;
         
-        if (roomData.error) {
-            return callback('Room does not exist');
+        while (retries > 0) {
+            roomData = getRoom(room);
+            
+            if (!roomData.error) {
+                break;
+            }
+            
+            // If room doesn't exist, wait briefly and retry
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries--;
         }
         
-        // Verify password for private rooms
+        // If still no room after retries, check MongoDB
+        if (roomData.error) {
+            const dbRoom = await Room.findOne({ roomName: room });
+            
+            if (dbRoom) {
+                // Room exists in DB but not in memory, recreate it
+                roomData = addRoom(room, dbRoom.isPrivate, password);
+            } else {
+                return callback('Room does not exist');
+            }
+        }
+        
+        // Rest of your existing join logic
         if (roomData.isPrivate) {
             const isRoomCreator = getAllRooms().find(r => r.roomName === room && r.password === password);
             
@@ -132,14 +170,12 @@ socket.on('join', async ({username, room, password}, callback) => {
         // Fetch message history
         const messageHistory = await Message.getMessagesByRoom(dbRoom._id);
         
-        // Send message history to the joining user
         socket.emit('messageHistory', messageHistory.map(msg => ({
             username: msg.name,
             text: msg.text,
             createdAt: msg.createdAt
         })));
 
-        // Increment user count
         if (!roomData.error) {
             incUserNum(user.room);
         }
@@ -153,6 +189,7 @@ socket.on('join', async ({username, room, password}, callback) => {
 
         callback();
     } catch (error) {
+        console.error('Error joining room:', error);
         callback(error.message);
     }
 });
